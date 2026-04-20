@@ -1,5 +1,19 @@
-html, body{
-    margin: 0;
-    padding: 0;
+body {
     background-color: black;
+    margin: 20px 0px 0px 0px;
+    text-align: center;
 }
+
+#test{
+color: whitesmoke;
+background: linear-gradient(to right, #ec8ff3, #6f1c88);
+width: 500px;
+height: 200px;
+margin: auto;
+text-align: center;
+border: 1px solid black;
+border-radius: 15px;
+box-shadow: 2px 6px 8px rgba(206, 91, 201, 0.716);
+}
+
+
