@@ -1,19 +1,158 @@
+:root {
+    --bark: #2e2412; /* тёмно-коричневый ствол */
+    --moss: #132b00; /* оливковый */
+    --lime: #58650b; /* жёлто-зелёный акцент */
+    --stone: #a69c7c; /* тёплый серо-бежевый */
+    --cream: #efe6c4; /* светлый бежевый фон */
+    --fern: #7a8c3a; /* светлее lime — для hover-эффектов, акцентов посветлее */
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: black;
-    margin: 20px 0px 0px 0px;
-    text-align: center;
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: var(--cream);
+    color: var(--bark);
 }
 
-#test{
-color: whitesmoke;
-background: linear-gradient(to right, #ec8ff3, #6f1c88);
-width: 500px;
-height: 200px;
-margin: auto;
-text-align: center;
-border: 1px solid black;
-border-radius: 15px;
-box-shadow: 2px 6px 8px rgba(206, 91, 201, 0.716);
+/* ---------- header ---------- */
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--moss);
+    padding: 14px 24px;
 }
 
+.logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: 0.5px;
+}
 
+.nav-icons {
+    display: flex;
+    gap: 12px;
+}
+
+.nav-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 40px;
+    background: var(--bark);
+    border-radius: 8px;
+    color: var(--stone);
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* ---------- search bar ---------- */
+
+.search-wrap {
+    padding: 0 24px;
+}
+
+.search-bar {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    background: var(--bark);
+    border-radius: 20px;
+    padding: 10px 18px;
+    max-width: 1500px;
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: var(--cream);
+    font-size: 15px;
+}
+
+.search-bar input::placeholder {
+    color: var(--stone);
+}
+
+.icon-search {
+    color: var(--stone);
+}
+
+/* ---------- layout ---------- */
+
+.layout {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    align-items: flex-start;
+}
+
+nav {
+    flex: 1;
+}
+
+aside h2 {
+    margin: 0;
+    padding: 12px 14px;
+    background: var(--lime);
+    color: var(--bark);
+    font-size: 15px;
+}
+
+.category-list {
+    background: var(--bark);
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-list li {
+    background: var(--stone);
+    color: var(--bark);
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.category-list li:hover {
+    background: var(--lime);
+}
+
+.category-list li.active {
+    background: var(--lime);
+    font-weight: 600;
+}
+
+.category-list li.active:hover {
+    background: var(--fern);
+}
+
+/* ---------- main content ---------- */
+main {
+    flex: 3;
+    min-height: 500px;
+    background: var(--stone);
+    border: 2px dashed var(--moss);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bark);
+    font-size: 15px;
+    opacity: 0.7;
+}
+
+footer {
+    clear: both;
+}
