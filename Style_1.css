@@ -1,10 +1,21 @@
 :root {
-    --bark: #2e2412; /* тёмно-коричневый ствол */
-    --moss: #132b00; /* оливковый */
-    --lime: #58650b; /* жёлто-зелёный акцент */
-    --stone: #a69c7c; /* тёплый серо-бежевый */
-    --cream: #efe6c4; /* светлый бежевый фон */
-    --fern: #7a8c3a; /* светлее lime — для hover-эффектов, акцентов посветлее */
+    /* Ciemne kolory: tekst, nagłówek, panele */
+    --bark: #2e2412; /* ciemny brąz – kolor tekstu */
+    --moss: #232e10; /* ciemna oliwkowa zieleń – nagłówek, panele, stopka */
+    --pine: #33431a; /* jaśniejsza zieleń – pola i przyciski na ciemnym tle */
+
+    /* Akcenty (wszystkie z jednej rodziny oliwkowej zieleni) */
+    --lime: #58650b; /* główny akcent – nagłówki, aktywne elementy, przyciski */
+    --lime-dark: #4a560a; /* ciemniejszy lime – hover na przyciskach */
+    --fern: #7a8c3a; /* jasny akcent – obwódki fokusu */
+    --brick: #a3392b; /* ceglasty – tylko serduszko (ulubione) */
+
+    /* Jasne tła i neutralne */
+    --cream: #efe6c4; /* tło strony */
+    --paper: #f8f3dc; /* tło kart produktów (jaśniejsze niż strona) */
+    --sand: #d9cfa6; /* elementy list, puste zdjęcia */
+    --stone: #a69c7c; /* ramki i ikony */
+    --muted: #6b5f42; /* mniej ważny tekst na jasnym tle */
 }
 
 * {
@@ -44,18 +55,25 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 70px;
+    min-width: 70px; /* było width: "Ulubione" ledwo mieściło się w 70px */
     height: 40px;
-    background: var(--bark);
+    padding: 0 14px;
+    background: var(--pine);
     border-radius: 8px;
-    color: var(--stone);
+    color: var(--sand);
     text-decoration: none;
     font-size: 16px;
+}
+
+.nav-icons a:hover {
+    background: var(--lime);
+    color: var(--cream);
 }
 
 /* ---------- search bar ---------- */
 
 .search-wrap {
+    flex: 1; /* wyszukiwarka zajmuje wolne miejsce w nagłówku */
     padding: 0 24px;
 }
 
@@ -63,23 +81,31 @@ header {
     align-items: center;
     display: flex;
     gap: 10px;
-    background: var(--bark);
+    background: var(--pine);
     border-radius: 20px;
     padding: 10px 18px;
     max-width: 1500px;
 }
 
+/* obwódka całego paska, gdy pole jest aktywne (zamiast usuniętego outline) */
+.search-bar:focus-within {
+    box-shadow: 0 0 0 2px var(--fern);
+}
+
 .search-bar input {
     flex: 1;
+    min-width: 0;
     border: none;
     background: transparent;
     outline: none;
     color: var(--cream);
+    font-family: inherit;
     font-size: 15px;
 }
 
 .search-bar input::placeholder {
-    color: var(--stone);
+    color: var(--sand);
+    opacity: 0.8;
 }
 
 .icon-search {
@@ -103,12 +129,17 @@ aside h2 {
     margin: 0;
     padding: 12px 14px;
     background: var(--lime);
-    color: var(--bark);
+    color: var(--cream); /* na lime ciemny brąz był słabo widoczny */
     font-size: 15px;
 }
 
-.category-list {
-    background: var(--bark);
+.category-list-h2 {
+    margin-top: 20px;
+}
+
+.category-list,
+.category-list2 {
+    background: var(--moss);
     list-style: none;
     margin: 0;
     padding: 10px;
@@ -117,42 +148,244 @@ aside h2 {
     gap: 8px;
 }
 
-.category-list li {
-    background: var(--stone);
+.category-list li,
+.category-list2 li {
+    background: var(--sand);
     color: var(--bark);
-    padding: 9px 12px;
     border-radius: 6px;
     font-size: 14px;
 }
 
-.category-list li:hover {
+.category-list li {
+    padding: 9px 12px;
+}
+
+.category-list li:hover,
+.category-list2 li:hover {
     background: var(--lime);
+    color: var(--cream);
 }
 
 .category-list li.active {
     background: var(--lime);
+    color: var(--cream);
     font-weight: 600;
 }
 
 .category-list li.active:hover {
-    background: var(--fern);
+    background: var(--lime-dark);
 }
 
-/* ---------- main content ---------- */
+/* Przycisk wypełnia cały element listy, więc klika się w całą "pigułkę" */
+.category-list2 button {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.category-list2 button:focus-visible {
+    outline: 2px solid var(--fern);
+    outline-offset: 2px;
+}
+
+/* ---------- main content: katalog produktów ---------- */
+
 main {
     flex: 3;
-    min-height: 500px;
-    background: var(--stone);
-    border: 2px dashed var(--moss);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bark);
-    font-size: 15px;
-    opacity: 0.7;
+    min-width: 0; /* siatka nie wypycha układu strony */
 }
+
+.count {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.empty {
+    padding: 32px 0;
+    color: var(--muted);
+}
+
+/* Siatka kart: sama dopasowuje liczbę kolumn do szerokości */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--paper);
+    border: 1px solid var(--stone);
+    border-radius: 10px;
+}
+
+/* Miejsce na zdjęcie (bez zdjęcia pokazuje się pierwsza litera nazwy) */
+.thumb {
+    position: relative; /* żeby serduszko stało w rogu */
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    background: var(--sand);
+    color: var(--lime);
+    font-size: 3rem;
+    font-weight: 600;
+}
+
+.thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+}
+
+.cat {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.price {
+    margin: 4px 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--lime);
+}
+
+/* Serduszko (ulubione) */
+.fav-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(248, 243, 220, 0.92);
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.fav-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.fav-btn:hover,
+.fav-btn.active {
+    color: var(--brick);
+}
+
+.fav-btn.active svg {
+    fill: currentColor;
+}
+
+/* Przycisk "Do koszyka" */
+.cart-btn {
+    margin-top: auto; /* przyklejony do dołu karty */
+    padding: 10px;
+    border: 1px solid var(--lime);
+    border-radius: 8px;
+    background: var(--lime);
+    color: var(--cream);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.cart-btn:hover {
+    background: var(--lime-dark);
+    border-color: var(--lime-dark);
+}
+
+.cart-btn.in-cart {
+    background: transparent;
+    color: var(--lime);
+}
+
+.cart-btn.in-cart:hover {
+    background: var(--sand);
+    color: var(--lime-dark);
+}
+
+/* Widoczna ramka przy nawigacji klawiaturą (Tab) */
+.fav-btn:focus-visible,
+.cart-btn:focus-visible {
+    outline: 2px solid var(--fern);
+    outline-offset: 2px;
+}
+
+/* ---------- footer ---------- */
 
 footer {
     clear: both;
+    background: var(--moss);
+    color: var(--sand);
+    padding: 18px 24px;
+    font-size: 14px;
+}
+
+/* ---------- telefony i wąskie ekrany ---------- */
+
+@media (max-width: 800px) {
+    header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .search-wrap {
+        order: 3; /* wyszukiwarka pod logo i przyciskami */
+        flex-basis: 100%;
+        padding: 0;
+    }
+
+    .layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    nav,
+    main {
+        flex: none;
+    }
+
+    /* węższe karty, żeby na telefonie mieściły się po dwie w rzędzie */
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .body {
+        padding: 10px;
+    }
 }
