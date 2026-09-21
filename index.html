@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Sklepic.pl</title>
+        <title>Pluszak.pl</title>
         <link rel="stylesheet" href="Style_1.css" />
     </head>
     <body>
@@ -12,7 +12,14 @@
             <div class="search-wrap">
                 <div class="search-bar">
                     <span class="icon-search">⚲</span>
-                    <input type="text" placeholder="Napisz czego szukasz..." />
+                    <!-- id="search" jest potrzebne, żeby skrypt znalazł to pole -->
+                    <input
+                        id="search"
+                        type="text"
+                        placeholder="Napisz czego szukasz..."
+                        autocomplete="off"
+                        aria-label="Szukaj produktu"
+                    />
                 </div>
             </div>
             <div class="nav-icons">
@@ -24,18 +31,279 @@
         <div class="layout">
             <nav>
                 <aside>
-                    <h2>Категории</h2>
+                    <h2>Kategorie</h2>
                     <ul class="category-list">
-                        <li>Категория 1</li>
-                        <li>Категория 2</li>
-                        <li>Категория 3</li>
-                        <li class="active">Что-то ещё</li>
+                        <li>Kategoria 1</li>
+                        <li>Kategoria 2</li>
+                        <li>Kategoria 3</li>
+                        <li class="active">Coś jeszcze</li>
+                    </ul>
+                </aside>
+                <aside>
+                    <h2 class="category-list-h2">Info o nas</h2>
+                    <ul class="category-list2">
+                        <li><button id="myButton_1">Jak zamówić?</button></li>
+                        <li>
+                            <button id="myButton_2">
+                                Gdzie możesz nas znaleźć?
+                            </button>
+                        </li>
+                        <li>
+                            <button id="myButton_3">
+                                Kto stworzył tę stronę?
+                            </button>
+                        </li>
                     </ul>
                 </aside>
             </nav>
 
-            <main>контент / товары — заполним позже</main>
+            <!-- W main są tylko puste "pojemniki". Karty wstawia skrypt. -->
+            <main>
+                <p id="count" class="count"></p>
+                <div id="grid" class="grid"></div>
+                <p id="empty" class="empty" hidden>
+                    Nic nie znaleziono. Spróbuj zmienić wyszukiwanie.
+                </p>
+            </main>
         </div>
         <footer>informacja o nas</footer>
+
+        <script>
+            // ===== 1. PRZYCISKI "INFO O NAS" =====
+            const texts = {
+                myButton_1: "Napisz nam! +488889385082",
+                myButton_2: "Opole, pl. Kopernika 16",
+                myButton_3: "Nataliia M. i Filip K.",
+            };
+
+            document
+                .querySelectorAll(".category-list2 button")
+                .forEach(function (btn) {
+                    const original = btn.textContent; // zapamiętujemy pierwotny tekst
+
+                    btn.addEventListener("click", function () {
+                        btn.textContent =
+                            btn.textContent === original
+                                ? texts[btn.id]
+                                : original;
+                    });
+                });
+
+            // ===== 2. KATALOG PRODUKTÓW =====
+
+            // Dane. Później tę tablicę można zastąpić odpowiedzią z serwera (fetch).
+            // image zostaw puste ("") - wtedy pokaże się pierwsza litera nazwy.
+            const products = [
+                {
+                    id: 1,
+                    name: "Miś pluszowy 30 cm",
+                    category: "Misie",
+                    price: 49,
+                    image: "",
+                },
+                {
+                    id: 2,
+                    name: "Króliczek z długimi uszami",
+                    category: "Króliki",
+                    price: 39,
+                    image: "",
+                },
+                {
+                    id: 3,
+                    name: "Pluszowy jednorożec",
+                    category: "Bajkowe",
+                    price: 69,
+                    image: "",
+                },
+                {
+                    id: 4,
+                    name: "Słonik szary 25 cm",
+                    category: "Zwierzęta egzotyczne",
+                    price: 45,
+                    image: "",
+                },
+                {
+                    id: 5,
+                    name: "Kot leniuch 40 cm",
+                    category: "Koty",
+                    price: 59,
+                    image: "",
+                },
+                {
+                    id: 6,
+                    name: "Piesek labrador",
+                    category: "Psy",
+                    price: 55,
+                    image: "",
+                },
+                {
+                    id: 7,
+                    name: "Duży miś 80 cm",
+                    category: "Misie",
+                    price: 149,
+                    image: "",
+                },
+                {
+                    id: 8,
+                    name: "Pluszowa żaba",
+                    category: "Zwierzęta leśne",
+                    price: 35,
+                    image: "",
+                },
+                {
+                    id: 9,
+                    name: "Lisek z puszystym ogonem",
+                    category: "Zwierzęta leśne",
+                    price: 52,
+                    image: "",
+                },
+                {
+                    id: 10,
+                    name: "Panda przytulanka",
+                    category: "Zwierzęta egzotyczne",
+                    price: 65,
+                    image: "",
+                },
+            ];
+
+            // Teksty na przyciskach w jednym miejscu (łatwo je zmienić)
+            const TXT = {
+                addToCart: "Do koszyka",
+                inCart: "W koszyku ✓",
+            };
+
+            // Elementy strony
+            const grid = document.getElementById("grid");
+            const search = document.getElementById("search");
+            const count = document.getElementById("count");
+            const empty = document.getElementById("empty");
+
+            const formatPrice = new Intl.NumberFormat("pl-PL", {
+                style: "currency",
+                currency: "PLN",
+                maximumFractionDigits: 0,
+            });
+
+            // Stan: id produktów w ulubionych i w koszyku.
+            // Na razie żyje tylko do odświeżenia strony.
+            const favorites = new Set();
+            const cart = new Set();
+
+            // Ochrona przed wstawieniem cudzego HTML (ważne, gdy dane przyjdą z serwera)
+            function escapeHtml(str) {
+                return String(str).replace(
+                    /[&<>"']/g,
+                    (ch) =>
+                        ({
+                            "&": "&amp;",
+                            "<": "&lt;",
+                            ">": "&gt;",
+                            '"': "&quot;",
+                            "'": "&#39;",
+                        })[ch],
+                );
+            }
+
+            // Zamienia tekst na małe litery i usuwa polskie znaki,
+            // dzięki temu "mis" znajdzie "Miś", a "zaba" znajdzie "żaba"
+            function simplify(text) {
+                return text
+                    .toLowerCase()
+                    .replace(/ł/g, "l") // "ł" nie rozkłada się przy normalize, robimy ręcznie
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+            }
+
+            // Jedna karta produktu
+            function cardHtml(p) {
+                const thumb = p.image
+                    ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+                    : escapeHtml(p.name[0]);
+
+                const isFav = favorites.has(p.id);
+                const inCart = cart.has(p.id);
+
+                return `
+                <article class="card" data-id="${p.id}">
+                  <div class="thumb">
+                    ${thumb}
+                    <button class="fav-btn${isFav ? " active" : ""}" type="button"
+                            aria-pressed="${isFav}" aria-label="Dodaj do ulubionych">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="body">
+                    <p class="cat">${escapeHtml(p.category)}</p>
+                    <h3 class="name">${escapeHtml(p.name)}</h3>
+                    <p class="price">${formatPrice.format(p.price)}</p>
+                    <button class="cart-btn${inCart ? " in-cart" : ""}" type="button">
+                      ${inCart ? TXT.inCart : TXT.addToCart}
+                    </button>
+                  </div>
+                </article>`;
+            }
+
+            // Wyświetlanie listy
+            function render(list) {
+                grid.innerHTML = list.map(cardHtml).join("");
+                count.textContent = "Znaleziono produktów: " + list.length;
+                empty.hidden = list.length > 0;
+            }
+
+            // Wyszukiwanie: każde słowo z zapytania musi być w nazwie
+            function applySearch() {
+                const words = simplify(search.value)
+                    .trim()
+                    .split(/\s+/)
+                    .filter(Boolean);
+
+                const result = products.filter((p) => {
+                    const name = simplify(p.name);
+                    return words.every((word) => name.includes(word));
+                });
+
+                render(result);
+            }
+
+            search.addEventListener("input", applySearch);
+
+            // Przyciski w kartach.
+            // Jeden nasłuch na całą siatkę: karty są tworzone od nowa przy każdym
+            // wyszukiwaniu, więc nasłuchy na samych przyciskach by znikały.
+            grid.addEventListener("click", function (e) {
+                const card = e.target.closest(".card");
+                if (!card) return;
+                const id = Number(card.dataset.id);
+
+                // Serduszko
+                const favBtn = e.target.closest(".fav-btn");
+                if (favBtn) {
+                    if (favorites.has(id)) favorites.delete(id);
+                    else favorites.add(id);
+
+                    favBtn.classList.toggle("active", favorites.has(id));
+                    favBtn.setAttribute("aria-pressed", favorites.has(id));
+                    return;
+                }
+
+                // Do koszyka
+                const cartBtn = e.target.closest(".cart-btn");
+                if (cartBtn) {
+                    if (cart.has(id)) cart.delete(id);
+                    else cart.add(id);
+
+                    cartBtn.classList.toggle("in-cart", cart.has(id));
+                    cartBtn.textContent = cart.has(id)
+                        ? TXT.inCart
+                        : TXT.addToCart;
+                }
+            });
+
+            // Start: pokazujemy wszystkie produkty
+            render(products);
+        </script>
     </body>
 </html>
+s
