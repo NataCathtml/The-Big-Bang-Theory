@@ -23,21 +23,76 @@
                 </div>
             </div>
             <div class="nav-icons">
-                <a href="index.html">Główna</a>
-                <a href="cart.html">Koszyk</a>
-                <a href="favorites.html">Ulubione</a>
+                <button type="button" id="cart-toggle" aria-haspopup="true">
+                    Koszyk
+                    <span class="badge" id="cart-badge" hidden>0</span>
+                </button>
+                <button type="button" id="fav-toggle" aria-haspopup="true">
+                    Ulubione
+                    <span class="badge" id="fav-badge" hidden>0</span>
+                </button>
             </div>
         </header>
         <div class="layout">
             <nav>
                 <aside>
                     <h2>Kategorie</h2>
-                    <ul class="category-list">
-                        <li>Kategoria 1</li>
-                        <li>Kategoria 2</li>
-                        <li>Kategoria 3</li>
-                        <li class="active">Coś jeszcze</li>
+                    <ul class="category-list" id="category-list">
+                        <li>
+                            <button type="button" data-category="Zwierzęta">
+                                Zwierzęta
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                type="button"
+                                data-category="Zwierzęta egzotyczne"
+                            >
+                                Zwierzęta egzotyczne
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" data-category="Mega">
+                                Mega
+                            </button>
+                        </li>
                     </ul>
+
+                    <h2 class="category-list-h2">Cena</h2>
+                    <div class="price-filter">
+                        <p class="price-value">
+                            Cena:
+                            <span id="price-output">0 zł - 1000 zł</span>
+                        </p>
+
+                        <div class="range-slider">
+                            <!-- kolorowy pasek pokazujący wybrany zakres -->
+                            <div class="slider-track" id="slider-track"></div>
+                            <!-- suwak "od" -->
+                            <input
+                                type="range"
+                                id="slider-min"
+                                min="0"
+                                max="1000"
+                                step="10"
+                                value="0"
+                            />
+                            <!-- suwak "do" -->
+                            <input
+                                type="range"
+                                id="slider-max"
+                                min="0"
+                                max="1000"
+                                step="10"
+                                value="1000"
+                            />
+                        </div>
+
+                        <div class="price-range-limits">
+                            <span>0 zł</span>
+                            <span>1000 zł</span>
+                        </div>
+                    </div>
                 </aside>
                 <aside>
                     <h2 class="category-list-h2">Info o nas</h2>
@@ -66,11 +121,60 @@
                 </p>
             </main>
         </div>
-        <footer>informacja o nas</footer>
+        <footer>
+            Strona stworzona w celach edukacyjnych przez Natalię M. i Filipa K.
+            w ramach nauki tworzenia stron internetowych. Nie jest to prawdziwy
+            sklep internetowy – żadne zamówienia złożone na tej stronie nie są
+            realizowane, a wszystkie produkty, zdjęcia i ceny mają charakter
+            przykładowy.
+        </footer>
+
+        <!-- Wysuwany panel: ULUBIONE -->
+        <aside id="fav-panel" class="side-panel" aria-hidden="true">
+            <div class="side-panel-header">
+                <h2>Ulubione</h2>
+                <button
+                    class="side-panel-close"
+                    id="fav-close"
+                    type="button"
+                    aria-label="Zamknij panel ulubionych"
+                >
+                    ✕
+                </button>
+            </div>
+            <div class="side-panel-body" id="fav-list"></div>
+        </aside>
+
+        <!-- Wysuwany panel: KOSZYK -->
+        <aside id="cart-panel" class="side-panel" aria-hidden="true">
+            <div class="side-panel-header">
+                <h2>Koszyk</h2>
+                <button
+                    class="side-panel-close"
+                    id="cart-close"
+                    type="button"
+                    aria-label="Zamknij koszyk"
+                >
+                    ✕
+                </button>
+            </div>
+            <div class="side-panel-body" id="cart-list"></div>
+            <div class="side-panel-footer">
+                <p class="cart-total">
+                    Razem: <span id="cart-total">0 zł</span>
+                </p>
+                <button class="order-btn" id="order-btn" type="button">
+                    Zamów
+                </button>
+            </div>
+        </aside>
+
+        <!-- Przyciemnione tło za wysuniętym panelem; klik zamyka panel -->
+        <div class="overlay" id="overlay"></div>
 
         <script>
             // ===== 1. PRZYCISKI "INFO O NAS" =====
-            const texts = {
+            const infoTexts = {
                 myButton_1: "Napisz nam! +488889385082",
                 myButton_2: "Opole, pl. Kopernika 16",
                 myButton_3: "Nataliia M. i Filip K.",
@@ -84,27 +188,27 @@
                     btn.addEventListener("click", function () {
                         btn.textContent =
                             btn.textContent === original
-                                ? texts[btn.id]
+                                ? infoTexts[btn.id]
                                 : original;
                     });
                 });
 
-            // ===== 2. KATALOG PRODUKTÓW =====
-
-            // Dane. Później tę tablicę można zastąpić odpowiedzią z serwera (fetch).
+            // ===== 2. DANE PRODUKTÓW =====
+            // Kategorie są tylko trzy: "Zwierzęta", "Zwierzęta egzotyczne", "Mega".
+            // Później tę tablicę można zastąpić odpowiedzią z serwera (fetch).
             // image zostaw puste ("") - wtedy pokaże się pierwsza litera nazwy.
-           const products = [
+            const products = [
                 {
                     id: 1,
                     name: "Miś pluszowy 30 cm",
-                    category: "Misie",
+                    category: "Zwierzęta",
                     price: 49,
                     image: "foto/Mis-pluszowy-30-cm.webp",
                 },
                 {
                     id: 2,
                     name: "Króliczek z długimi uszami",
-                    category: "Króliki",
+                    category: "Zwierzęta",
                     price: 39,
                     image: "foto/kroliczek--z-dlugimi-uszami.jpe",
                 },
@@ -124,59 +228,162 @@
                 },
                 {
                     id: 5,
-                    name: "Kot leniuch 40 cm",
-                    category: "Koty",
+                    name: "Kot czarny 40 cm",
+                    category: "Zwierzęta",
                     price: 59,
-                    image: "",
+                    image: "foto/kot-czarny.webp",
                 },
                 {
                     id: 6,
                     name: "Piesek labrador",
-                    category: "Psy",
+                    category: "Zwierzęta",
                     price: 55,
-                    image: "",
+                    image: "foto/Labrador-Piesek.webp",
                 },
                 {
                     id: 7,
                     name: "Duży miś 80 cm",
-                    category: "Misie",
+                    category: "Mega",
                     price: 149,
-                    image: "",
+                    image: "foto/Mis_durzy.jpg",
                 },
                 {
                     id: 8,
-                    name: "Pluszowa żaba",
-                    category: "Zwierzęta leśne",
-                    price: 35,
-                    image: "",
+                    name: "Aligator Gigant 125cm",
+                    category: "Mega",
+                    price: 235,
+                    image: "foto/Aligator_durzy_125cm.jpg",
                 },
                 {
                     id: 9,
                     name: "Lisek z puszystym ogonem",
-                    category: "Zwierzęta leśne",
+                    category: "Zwierzęta",
                     price: 52,
-                    image: "",
+                    image: "foto/lis_maly.jpg",
                 },
                 {
                     id: 10,
                     name: "Panda przytulanka",
                     category: "Zwierzęta egzotyczne",
                     price: 65,
-                    image: "",
+                    image: "foto/MIS-PANDA.webp",
+                },
+                {
+                    id: 11,
+                    name: "Sowa pluszowa 25 cm",
+                    category: "Zwierzęta",
+                    price: 42,
+                    image: "foto/Sowa pluszowa_25.jpg",
+                },
+                {
+                    id: 12,
+                    name: "Szop pluszowy mały",
+                    category: "Zwierzęta egzotyczne",
+                    price: 35,
+                    image: "foto/jenot_maly.jpg",
+                },
+                {
+                    id: 13,
+                    name: "Żyrafa pluszowa 60 cm",
+                    category: "Zwierzęta egzotyczne",
+                    price: 79,
+                    image: "foto/Żyrafa_pluszowa_60_cm.jpg",
+                },
+                {
+                    id: 14,
+                    name: "Kolorowa papuga ara",
+                    category: "Zwierzęta egzotyczne",
+                    price: 58,
+                    image: "foto/pluszowa_papuga_ara.jpg",
+                },
+                {
+                    id: 15,
+                    name: "Lew pluszowy z grzywą",
+                    category: "Zwierzęta egzotyczne",
+                    price: 89,
+                    image: "foto/Lew_pluszowy.jpg",
+                },
+                {
+                    id: 16,
+                    name: "Delfin pluszowy 40 cm",
+                    category: "Zwierzęta egzotyczne",
+                    price: 62,
+                    image: "foto/Delfin_pluszowy_40_cm.jpg",
+                },
+                {
+                    id: 17,
+                    name: "Koala przytulanka",
+                    category: "Zwierzęta egzotyczne",
+                    price: 57,
+                    image: "foto/Koala.jpg",
+                },
+                {
+                    id: 18,
+                    name: "Kruk mały pluszowy",
+                    category: "Zwierzęta",
+                    price: 46,
+                    image: "foto/kruk_maly.jpg",
+                },
+                {
+                    id: 19,
+                    name: "Duża pluszowa gęś",
+                    category: "Mega",
+                    price: 299,
+                    image: "foto/Gus_duzy.jpg",
+                },
+                {
+                    id: 20,
+                    name: "Wielki rekin pluszowy",
+                    category: "Mega",
+                    price: 189,
+                    image: "foto/rekin_duzy.jpg",
+                },
+                {
+                    id: 21,
+                    name: "mały pluszowy dziobak",
+                    category: "Zwierzęta",
+                    price: 37,
+                    image: "foto/utkanos.jpg",
                 },
             ];
 
             // Teksty na przyciskach w jednym miejscu (łatwo je zmienić)
             const TXT = {
                 addToCart: "Do koszyka",
-                inCart: "W koszyku ✓",
+                inCart: (qty) => `W koszyku (${qty}) ✓`,
             };
 
-            // Elementy strony
+            // ===== 3. ELEMENTY STRONY =====
             const grid = document.getElementById("grid");
             const search = document.getElementById("search");
             const count = document.getElementById("count");
             const empty = document.getElementById("empty");
+            const categoryList = document.getElementById("category-list");
+
+            // Suwak cenowy
+            const sliderMin = document.getElementById("slider-min");
+            const sliderMax = document.getElementById("slider-max");
+            const priceOutput = document.getElementById("price-output");
+            const sliderTrack = document.getElementById("slider-track");
+            const PRICE_MAX = Number(sliderMin.max); // 1000
+            const PRICE_GAP = 10; // minimalna różnica między "od" i "do"
+
+            // Nagłówek: przyciski i plakietki z licznikiem
+            const favToggle = document.getElementById("fav-toggle");
+            const cartToggle = document.getElementById("cart-toggle");
+            const favBadge = document.getElementById("fav-badge");
+            const cartBadge = document.getElementById("cart-badge");
+
+            // Panele boczne
+            const favPanel = document.getElementById("fav-panel");
+            const cartPanel = document.getElementById("cart-panel");
+            const favList = document.getElementById("fav-list");
+            const cartList = document.getElementById("cart-list");
+            const cartTotalEl = document.getElementById("cart-total");
+            const orderBtn = document.getElementById("order-btn");
+            const overlay = document.getElementById("overlay");
+            const favClose = document.getElementById("fav-close");
+            const cartClose = document.getElementById("cart-close");
 
             const formatPrice = new Intl.NumberFormat("pl-PL", {
                 style: "currency",
@@ -184,10 +391,13 @@
                 maximumFractionDigits: 0,
             });
 
-            // Stan: id produktów w ulubionych i w koszyku.
-            // Na razie żyje tylko do odświeżenia strony.
-            const favorites = new Set();
-            const cart = new Set();
+            // ===== 4. STAN =====
+            // Na razie żyje tylko do odświeżenia strony (bez zapisu na serwerze).
+            const favorites = new Set(); // id ulubionych produktów
+            const cart = new Map(); // id produktu -> ilość sztuk w koszyku
+            let activeCategory = null; // wybrana kategoria; null = wszystkie
+
+            // ===== 5. FUNKCJE POMOCNICZE =====
 
             // Ochrona przed wstawieniem cudzego HTML (ważne, gdy dane przyjdą z serwera)
             function escapeHtml(str) {
@@ -214,19 +424,27 @@
                     .replace(/[\u0300-\u036f]/g, "");
             }
 
-            // Jedna karta produktu
-            function cardHtml(p) {
-                const thumb = p.image
+            // Miniatura używana i w karcie produktu, i w panelach bocznych
+            function thumbHtml(p) {
+                return p.image
                     ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy">`
                     : escapeHtml(p.name[0]);
+            }
 
+            function findProduct(id) {
+                return products.find((p) => p.id === id);
+            }
+
+            // ===== 6. KARTA PRODUKTU (katalog główny) =====
+            function cardHtml(p) {
                 const isFav = favorites.has(p.id);
-                const inCart = cart.has(p.id);
+                const qty = cart.get(p.id) || 0;
+                const inCart = qty > 0;
 
                 return `
                 <article class="card" data-id="${p.id}">
                   <div class="thumb">
-                    ${thumb}
+                    ${thumbHtml(p)}
                     <button class="fav-btn${isFav ? " active" : ""}" type="button"
                             aria-pressed="${isFav}" aria-label="Dodaj do ulubionych">
                       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -239,71 +457,313 @@
                     <h3 class="name">${escapeHtml(p.name)}</h3>
                     <p class="price">${formatPrice.format(p.price)}</p>
                     <button class="cart-btn${inCart ? " in-cart" : ""}" type="button">
-                      ${inCart ? TXT.inCart : TXT.addToCart}
+                      ${inCart ? TXT.inCart(qty) : TXT.addToCart}
                     </button>
                   </div>
                 </article>`;
             }
 
-            // Wyświetlanie listy
             function render(list) {
                 grid.innerHTML = list.map(cardHtml).join("");
                 count.textContent = "Znaleziono produktów: " + list.length;
                 empty.hidden = list.length > 0;
             }
 
-            // Wyszukiwanie: każde słowo z zapytania musi być w nazwie
-            function applySearch() {
+            // ===== 7. FILTRY: szukajka + kategoria + cena (razem) =====
+            function applyFilters() {
                 const words = simplify(search.value)
                     .trim()
                     .split(/\s+/)
                     .filter(Boolean);
 
+                const minPrice = Number(sliderMin.value);
+                const maxPrice = Number(sliderMax.value);
+
                 const result = products.filter((p) => {
                     const name = simplify(p.name);
-                    return words.every((word) => name.includes(word));
+                    const matchesText = words.every((word) =>
+                        name.includes(word),
+                    );
+                    const matchesPrice =
+                        p.price >= minPrice && p.price <= maxPrice;
+                    const matchesCategory =
+                        !activeCategory || p.category === activeCategory;
+                    return matchesText && matchesPrice && matchesCategory;
                 });
 
                 render(result);
             }
 
-            search.addEventListener("input", applySearch);
+            search.addEventListener("input", applyFilters);
 
-            // Przyciski w kartach.
+            // Klik w kategorię: wybiera ją; ponowny klik w tę samą - czyści filtr
+            categoryList.addEventListener("click", function (e) {
+                const btn = e.target.closest("button[data-category]");
+                if (!btn) return;
+                const li = btn.closest("li");
+                const cat = btn.dataset.category;
+
+                if (activeCategory === cat) {
+                    activeCategory = null;
+                    li.classList.remove("active");
+                } else {
+                    activeCategory = cat;
+                    categoryList
+                        .querySelectorAll("li")
+                        .forEach((x) => x.classList.toggle("active", x === li));
+                }
+                applyFilters();
+            });
+
+            // ===== 8. SUWAK CENOWY =====
+            // Dwa uchwyty nie mogą się "minąć" ani zamienić miejscami
+            function updateSlider(e) {
+                let minVal = Number(sliderMin.value);
+                let maxVal = Number(sliderMax.value);
+
+                if (maxVal - minVal < PRICE_GAP) {
+                    if (e && e.target === sliderMin) {
+                        sliderMin.value = maxVal - PRICE_GAP;
+                    } else {
+                        sliderMax.value = minVal + PRICE_GAP;
+                    }
+                    minVal = Number(sliderMin.value);
+                    maxVal = Number(sliderMax.value);
+                }
+
+                priceOutput.textContent = `${minVal} zł - ${maxVal} zł`;
+
+                // pasek pomiędzy uchwytami pokazujący wybrany zakres
+                const percentMin = (minVal / PRICE_MAX) * 100;
+                const percentMax = (maxVal / PRICE_MAX) * 100;
+                sliderTrack.style.left = percentMin + "%";
+                sliderTrack.style.width = percentMax - percentMin + "%";
+
+                applyFilters();
+            }
+
+            sliderMin.addEventListener("input", updateSlider);
+            sliderMax.addEventListener("input", updateSlider);
+
+            // ===== 9. PRZYCISKI NA KARTACH: serduszko i "Do koszyka" =====
             // Jeden nasłuch na całą siatkę: karty są tworzone od nowa przy każdym
-            // wyszukiwaniu, więc nasłuchy na samych przyciskach by znikały.
+            // filtrowaniu, więc nasłuchy na samych przyciskach by znikały.
             grid.addEventListener("click", function (e) {
                 const card = e.target.closest(".card");
                 if (!card) return;
                 const id = Number(card.dataset.id);
 
-                // Serduszko
-                const favBtn = e.target.closest(".fav-btn");
-                if (favBtn) {
-                    if (favorites.has(id)) favorites.delete(id);
-                    else favorites.add(id);
-
-                    favBtn.classList.toggle("active", favorites.has(id));
-                    favBtn.setAttribute("aria-pressed", favorites.has(id));
+                if (e.target.closest(".fav-btn")) {
+                    toggleFavorite(id);
                     return;
                 }
-
-                // Do koszyka
-                const cartBtn = e.target.closest(".cart-btn");
-                if (cartBtn) {
-                    if (cart.has(id)) cart.delete(id);
-                    else cart.add(id);
-
-                    cartBtn.classList.toggle("in-cart", cart.has(id));
-                    cartBtn.textContent = cart.has(id)
-                        ? TXT.inCart
-                        : TXT.addToCart;
+                if (e.target.closest(".cart-btn")) {
+                    toggleCartItem(id);
                 }
             });
 
-            // Start: pokazujemy wszystkie produkty
-            render(products);
+            function toggleFavorite(id) {
+                if (favorites.has(id)) favorites.delete(id);
+                else favorites.add(id);
+                syncUI();
+            }
+
+            function toggleCartItem(id) {
+                if (cart.has(id)) cart.delete(id);
+                else cart.set(id, 1);
+                syncUI();
+            }
+
+            // ===== 10. PANEL "ULUBIONE" =====
+            function renderFavPanel() {
+                const items = products.filter((p) => favorites.has(p.id));
+
+                favList.innerHTML = items.length
+                    ? items
+                          .map(
+                              (p) => `
+                <div class="fav-item" data-id="${p.id}">
+                  <div class="fav-item-thumb">${thumbHtml(p)}</div>
+                  <div class="fav-item-info">
+                    <p class="fav-item-name">${escapeHtml(p.name)}</p>
+                    <p class="fav-item-price">${formatPrice.format(p.price)}</p>
+                  </div>
+                  <button class="fav-item-remove" type="button" aria-label="Usuń z ulubionych">✕</button>
+                </div>`,
+                          )
+                          .join("")
+                    : `<p class="side-panel-empty">Brak ulubionych produktów.</p>`;
+
+                favBadge.textContent = items.length;
+                favBadge.hidden = items.length === 0;
+            }
+
+            favList.addEventListener("click", function (e) {
+                const item = e.target.closest(".fav-item");
+                if (!item) return;
+                if (e.target.closest(".fav-item-remove")) {
+                    favorites.delete(Number(item.dataset.id));
+                    syncUI();
+                }
+            });
+
+            // ===== 11. PANEL "KOSZYK" =====
+            function renderCartPanel() {
+                const entries = [...cart.entries()];
+
+                cartList.innerHTML = entries.length
+                    ? entries
+                          .map(([id, qty]) => {
+                              const p = findProduct(id);
+                              if (!p) return "";
+                              const subtotal = p.price * qty;
+                              return `
+                <div class="cart-item" data-id="${id}">
+                  <div class="cart-item-thumb">${thumbHtml(p)}</div>
+                  <div class="cart-item-info">
+                    <p class="cart-item-name">${escapeHtml(p.name)}</p>
+                    <p class="cart-item-price">${formatPrice.format(p.price)} / szt.</p>
+                  </div>
+                  <div class="cart-item-qty">
+                    <button class="qty-btn" type="button" data-action="dec" aria-label="Zmniejsz ilość">−</button>
+                    <span class="qty-value">${qty}</span>
+                    <button class="qty-btn" type="button" data-action="inc" aria-label="Zwiększ ilość">+</button>
+                  </div>
+                  <p class="cart-item-subtotal">${formatPrice.format(subtotal)}</p>
+                  <button class="cart-item-remove" type="button" aria-label="Usuń z koszyka">✕</button>
+                </div>`;
+                          })
+                          .join("")
+                    : `<p class="side-panel-empty">Koszyk jest pusty.</p>`;
+
+                const totalQty = entries.reduce((sum, [, qty]) => sum + qty, 0);
+                const totalPrice = entries.reduce((sum, [id, qty]) => {
+                    const p = findProduct(id);
+                    return sum + (p ? p.price * qty : 0);
+                }, 0);
+
+                cartBadge.textContent = totalQty;
+                cartBadge.hidden = totalQty === 0;
+                cartTotalEl.textContent = formatPrice.format(totalPrice);
+                orderBtn.disabled = totalQty === 0;
+            }
+
+            cartList.addEventListener("click", function (e) {
+                const item = e.target.closest(".cart-item");
+                if (!item) return;
+                const id = Number(item.dataset.id);
+
+                if (e.target.closest(".cart-item-remove")) {
+                    cart.delete(id);
+                    syncUI();
+                    return;
+                }
+
+                const qtyBtn = e.target.closest(".qty-btn");
+                if (qtyBtn) {
+                    let qty = cart.get(id) || 0;
+                    qty += qtyBtn.dataset.action === "inc" ? 1 : -1;
+                    if (qty <= 0) cart.delete(id);
+                    else cart.set(id, qty);
+                    syncUI();
+                }
+            });
+
+            // ===== 12. ZŁOŻENIE ZAMÓWIENIA =====
+            // Otwiera domyślny program pocztowy z gotowym mailem (temat + treść).
+            // Wysłanie samego maila bez udziału klienta pocztowego wymagałoby
+            // serwera lub usługi typu EmailJS - to najprostszy sposób bez backendu.
+            orderBtn.addEventListener("click", function () {
+                if (cart.size === 0) return;
+
+                const lines = [...cart.entries()].map(([id, qty]) => {
+                    const p = findProduct(id);
+                    return p
+                        ? `${p.name} x ${qty} szt. = ${formatPrice.format(p.price * qty)}`
+                        : "";
+                });
+
+                const totalQty = [...cart.values()].reduce(
+                    (sum, qty) => sum + qty,
+                    0,
+                );
+                const totalPrice = [...cart.entries()].reduce(
+                    (sum, [id, qty]) => {
+                        const p = findProduct(id);
+                        return sum + (p ? p.price * qty : 0);
+                    },
+                    0,
+                );
+
+                const subject = `Nowe zamówienie – Pluszak.pl (${totalQty} szt.)`;
+                const body = [
+                    "Szczegóły zamówienia:",
+                    "",
+                    ...lines,
+                    "",
+                    `Liczba sztuk: ${totalQty}`,
+                    `Suma zamówienia: ${formatPrice.format(totalPrice)}`,
+                ].join("\n");
+
+                window.location.href =
+                    "mailto:malyshenko.praca.pl@gmail.com" +
+                    "?subject=" +
+                    encodeURIComponent(subject) +
+                    "&body=" +
+                    encodeURIComponent(body);
+            });
+
+            // ===== 13. OTWIERANIE / ZAMYKANIE PANELI BOCZNYCH =====
+            const panels = [favPanel, cartPanel];
+
+            function openPanel(panel) {
+                panels.forEach((p) => {
+                    const isThis = p === panel;
+                    p.classList.toggle("open", isThis);
+                    p.setAttribute("aria-hidden", isThis ? "false" : "true");
+                });
+                overlay.classList.add("show");
+            }
+
+            function closePanels() {
+                panels.forEach((p) => {
+                    p.classList.remove("open");
+                    p.setAttribute("aria-hidden", "true");
+                });
+                overlay.classList.remove("show");
+            }
+
+            favToggle.addEventListener("click", function () {
+                favPanel.classList.contains("open")
+                    ? closePanels()
+                    : openPanel(favPanel);
+            });
+
+            cartToggle.addEventListener("click", function () {
+                cartPanel.classList.contains("open")
+                    ? closePanels()
+                    : openPanel(cartPanel);
+            });
+
+            favClose.addEventListener("click", closePanels);
+            cartClose.addEventListener("click", closePanels);
+            overlay.addEventListener("click", closePanels);
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") closePanels();
+            });
+
+            // ===== 14. WSPÓLNA AKTUALIZACJA CAŁEGO INTERFEJSU =====
+            // Wywoływana po każdej zmianie ulubionych albo koszyka: odświeża
+            // karty w katalogu i oba panele boczne, żeby wszystko było spójne.
+            function syncUI() {
+                applyFilters();
+                renderFavPanel();
+                renderCartPanel();
+            }
+
+            // Start
+            updateSlider();
+            syncUI();
         </script>
     </body>
 </html>
-s
