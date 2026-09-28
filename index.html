@@ -11,7 +11,7 @@
             <div class="logo">Pluszak.pl</div>
             <div class="search-wrap">
                 <div class="search-bar">
-                    <span class="icon-search">⚲</span>
+                    <span class="icon-search" aria-hidden="true">🔍</span>
                     <!-- id="search" jest potrzebne, żeby skrypt znalazł to pole -->
                     <input
                         id="search"
@@ -23,52 +23,45 @@
                 </div>
             </div>
             <div class="nav-icons">
-                <button type="button" id="cart-toggle" aria-haspopup="true">
-                    Koszyk
+                <button type="button" id="cart-toggle" aria-haspopup="true" aria-expanded="false">
+                    🛒 Koszyk
                     <span class="badge" id="cart-badge" hidden>0</span>
                 </button>
-                <button type="button" id="fav-toggle" aria-haspopup="true">
-                    Ulubione
+                <button type="button" id="fav-toggle" aria-haspopup="true" aria-expanded="false">
+                    ♡ Ulubione
                     <span class="badge" id="fav-badge" hidden>0</span>
                 </button>
             </div>
         </header>
         <div class="layout">
             <nav>
-                <aside>
-                    <h2>Kategorie</h2>
-                    <ul class="category-list" id="category-list">
-                        <li>
-                            <button type="button" data-category="Zwierzęta">
-                                Zwierzęta
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                data-category="Zwierzęta egzotyczne"
-                            >
-                                Zwierzęta egzotyczne
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" data-category="Mega">
-                                Mega
-                            </button>
-                        </li>
+                <aside class="info-panel">
+                    <h2>Info o nas</h2>
+                    <ul class="category-list2">
+                        <li><a href="#faq">Jak działa katalog?</a></li>
+                        <li><a href="#delivery">Dostawa i płatności</a></li>
+                        <li><a href="#about">O projekcie i kontakt</a></li>
                     </ul>
-
-                    <h2 class="category-list-h2">Cena</h2>
+                </aside>
+                <aside class="gift-finder">
+                    <h2>Szukasz prezentu?</h2>
+                    <p>Wybierz kolekcję i znajdź pluszaka na każdą okazję.</p>
+                    <div class="gift-links" aria-label="Szybki wybór kategorii">
+                        <button type="button" data-category="Mega" aria-pressed="false">🐻 Duże pluszaki</button>
+                        <button type="button" data-category="Zwierzęta egzotyczne" aria-pressed="false">🦒 Egzotyczne zwierzaki</button>
+                        <button type="button" data-category="Zwierzęta" aria-pressed="false">🐰 Klasyczne zwierzaki</button>
+                    </div>
+                </aside>
+                <aside class="price-panel">
+                    <h2>Filtruj według ceny</h2>
                     <div class="price-filter">
                         <p class="price-value">
-                            Cena:
+                            Zakres:
                             <span id="price-output">0 zł - 1000 zł</span>
                         </p>
 
                         <div class="range-slider">
-                            <!-- kolorowy pasek pokazujący wybrany zakres -->
                             <div class="slider-track" id="slider-track"></div>
-                            <!-- suwak "od" -->
                             <input
                                 type="range"
                                 id="slider-min"
@@ -76,8 +69,8 @@
                                 max="1000"
                                 step="10"
                                 value="0"
+                                aria-label="Cena minimalna"
                             />
-                            <!-- suwak "do" -->
                             <input
                                 type="range"
                                 id="slider-max"
@@ -85,6 +78,7 @@
                                 max="1000"
                                 step="10"
                                 value="1000"
+                                aria-label="Cena maksymalna"
                             />
                         </div>
 
@@ -94,39 +88,83 @@
                         </div>
                     </div>
                 </aside>
-                <aside>
-                    <h2 class="category-list-h2">Info o nas</h2>
-                    <ul class="category-list2">
-                        <li><button id="myButton_1">Jak zamówić?</button></li>
-                        <li>
-                            <button id="myButton_2">
-                                Gdzie możesz nas znaleźć?
-                            </button>
-                        </li>
-                        <li>
-                            <button id="myButton_3">
-                                Kto stworzył tę stronę?
-                            </button>
-                        </li>
-                    </ul>
-                </aside>
             </nav>
 
             <!-- W main są tylko puste "pojemniki". Karty wstawia skrypt. -->
             <main>
-                <p id="count" class="count"></p>
+                <section class="hero" aria-labelledby="hero-title">
+                    <p class="eyebrow">PLUSZAKI, KTÓRE DAJĄ RADOŚĆ</p>
+                    <h1 id="hero-title">Znajdź swojego nowego przyjaciela</h1>
+                    <p>Przeglądaj kolekcję miękkich, wyjątkowych pluszaków. To katalog demonstracyjny — możesz swobodnie testować koszyk i ulubione.</p>
+                    <div class="hero-highlights" aria-label="Informacje o katalogu">
+                        <span>21 przykładowych produktów</span>
+                        <span>Wyszukiwanie i filtrowanie</span>
+                        <span>Bez prawdziwych płatności</span>
+                    </div>
+                </section>
+                <div class="catalog-toolbar">
+                    <p id="count" class="count" aria-live="polite"></p>
+                    <div class="toolbar-actions">
+                        <label for="sort">Sortuj:</label>
+                        <select id="sort">
+                            <option value="default">Polecane</option>
+                            <option value="price-asc">Cena: rosnąco</option>
+                            <option value="price-desc">Cena: malejąco</option>
+                            <option value="name">Nazwa: A–Z</option>
+                        </select>
+                        <button id="clear-filters" class="clear-filters" type="button">Wyczyść filtry</button>
+                    </div>
+                </div>
                 <div id="grid" class="grid"></div>
                 <p id="empty" class="empty" hidden>
                     Nic nie znaleziono. Spróbuj zmienić wyszukiwanie.
                 </p>
             </main>
         </div>
+        <section class="help-section" aria-label="Informacje dla odwiedzających">
+            <div class="help-card" id="faq">
+                <p class="eyebrow">POMOC</p>
+                <h2>Najczęstsze pytania</h2>
+                <details>
+                    <summary>Czy mogę złożyć prawdziwe zamówienie?</summary>
+                    <p>Nie. To projekt edukacyjny. Koszyk służy wyłącznie do demonstracji i nie wysyła zamówień.</p>
+                </details>
+                <details>
+                    <summary>Czy produkty i ceny są aktualne?</summary>
+                    <p>Nie. Nazwy, zdjęcia i ceny zostały przygotowane przykładowo na potrzeby prezentacji strony.</p>
+                </details>
+                <details>
+                    <summary>Jak korzystać z katalogu?</summary>
+                    <p>Wyszukaj pluszaka, wybierz kategorię lub zakres cen, a następnie sortuj wyniki. Możesz też zapisać produkty w ulubionych.</p>
+                </details>
+            </div>
+            <div class="help-card" id="delivery">
+                <p class="eyebrow">WAŻNE INFORMACJE</p>
+                <h2>Dostawa i płatności</h2>
+                <p>W tej demonstracji nie są realizowane płatności, wysyłka, zwroty ani reklamacje. Koszt dostawy i czas realizacji nie dotyczą przykładowego katalogu.</p>
+                <p>Nie podajemy niezweryfikowanych informacji o materiałach, bezpieczeństwie ani dostępności. Przed uruchomieniem prawdziwego sklepu należy uzupełnić je na podstawie danych sprzedawcy i producenta.</p>
+            </div>
+            <div class="help-card" id="about">
+                <p class="eyebrow">O STRONIE</p>
+                <h2>Projekt edukacyjny</h2>
+                <p>Pluszak.pl powstał w ramach nauki tworzenia stron internetowych. Autorzy projektu: Filip Klimza i Natalie Malysenko.</p>
+                <p>Strona nie jest sklepem, a dane kontaktowe, adresowe i handlowe nie są skonfigurowane do obsługi klientów.</p>
+            </div>
+        </section>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <div id="product-modal" class="modal" hidden>
+            <div class="modal-backdrop" data-close-modal></div>
+            <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <button class="modal-close" type="button" aria-label="Zamknij szczegóły" data-close-modal>✕</button>
+                <div id="modal-content"></div>
+            </section>
+        </div>
         <footer>
-            Strona stworzona w celach edukacyjnych przez Natalię M. i Filipa K.
-            w ramach nauki tworzenia stron internetowych. Nie jest to prawdziwy
-            sklep internetowy – żadne zamówienia złożone na tej stronie nie są
-            realizowane, a wszystkie produkty, zdjęcia i ceny mają charakter
-            przykładowy.
+            <p>Pluszak.pl — projekt edukacyjny autorstwa: <strong>Filip Klimza i Natalie Malysenko</strong>. Nie prowadzimy sprzedaży ani nie realizujemy zamówień. Produkty, zdjęcia i ceny mają charakter przykładowy.</p>
+            <a href="#faq">Pomoc</a>
+            <a href="#delivery">Dostawa i płatności</a>
+            <a href="#about">O projekcie</a>
         </footer>
 
         <!-- Wysuwany panel: ULUBIONE -->
@@ -164,7 +202,7 @@
                     Razem: <span id="cart-total">0 zł</span>
                 </p>
                 <button class="order-btn" id="order-btn" type="button">
-                    Zamów
+                Przetestuj zamówienie
                 </button>
             </div>
         </aside>
@@ -173,27 +211,7 @@
         <div class="overlay" id="overlay"></div>
 
         <script>
-            // ===== 1. PRZYCISKI "INFO O NAS" =====
-            const infoTexts = {
-                myButton_1: "Napisz nam! +488889385082",
-                myButton_2: "Opole, pl. Kopernika 16",
-                myButton_3: "Nataliia M. i Filip K.",
-            };
-
-            document
-                .querySelectorAll(".category-list2 button")
-                .forEach(function (btn) {
-                    const original = btn.textContent; // zapamiętujemy pierwotny tekst
-
-                    btn.addEventListener("click", function () {
-                        btn.textContent =
-                            btn.textContent === original
-                                ? infoTexts[btn.id]
-                                : original;
-                    });
-                });
-
-            // ===== 2. DANE PRODUKTÓW =====
+            // ===== 1. DANE PRODUKTÓW =====
             // Kategorie są tylko trzy: "Zwierzęta", "Zwierzęta egzotyczne", "Mega".
             // Później tę tablicę można zastąpić odpowiedzią z serwera (fetch).
             // image zostaw puste ("") - wtedy pokaże się pierwsza litera nazwy.
@@ -358,7 +376,12 @@
             const search = document.getElementById("search");
             const count = document.getElementById("count");
             const empty = document.getElementById("empty");
-            const categoryList = document.getElementById("category-list");
+            const giftLinks = document.querySelector(".gift-links");
+            const sortSelect = document.getElementById("sort");
+            const clearFilters = document.getElementById("clear-filters");
+            const toast = document.getElementById("toast");
+            const productModal = document.getElementById("product-modal");
+            const modalContent = document.getElementById("modal-content");
 
             // Suwak cenowy
             const sliderMin = document.getElementById("slider-min");
@@ -393,9 +416,14 @@
 
             // ===== 4. STAN =====
             // Na razie żyje tylko do odświeżenia strony (bez zapisu na serwerze).
-            const favorites = new Set(); // id ulubionych produktów
-            const cart = new Map(); // id produktu -> ilość sztuk w koszyku
+            const favorites = new Set(
+                JSON.parse(localStorage.getItem("pluszak-favorites") || "[]"),
+            ); // id ulubionych produktów
+            const cart = new Map(
+                JSON.parse(localStorage.getItem("pluszak-cart") || "[]"),
+            ); // id produktu -> ilość sztuk w koszyku
             let activeCategory = null; // wybrana kategoria; null = wszystkie
+            let toastTimer;
 
             // ===== 5. FUNKCJE POMOCNICZE =====
 
@@ -435,6 +463,21 @@
                 return products.find((p) => p.id === id);
             }
 
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add("show");
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+            }
+
+            function persistState() {
+                localStorage.setItem(
+                    "pluszak-favorites",
+                    JSON.stringify([...favorites]),
+                );
+                localStorage.setItem("pluszak-cart", JSON.stringify([...cart]));
+            }
+
             // ===== 6. KARTA PRODUKTU (katalog główny) =====
             function cardHtml(p) {
                 const isFav = favorites.has(p.id);
@@ -446,7 +489,7 @@
                   <div class="thumb">
                     ${thumbHtml(p)}
                     <button class="fav-btn${isFav ? " active" : ""}" type="button"
-                            aria-pressed="${isFav}" aria-label="Dodaj do ulubionych">
+                            aria-pressed="${isFav}" aria-label="${isFav ? "Usuń z ulubionych" : "Dodaj do ulubionych"}">
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                       </svg>
@@ -454,8 +497,9 @@
                   </div>
                   <div class="body">
                     <p class="cat">${escapeHtml(p.category)}</p>
-                    <h3 class="name">${escapeHtml(p.name)}</h3>
+                    <h3 class="name" tabindex="0" role="button" aria-label="Pokaż szczegóły: ${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
                     <p class="price">${formatPrice.format(p.price)}</p>
+                    <button class="details-btn" type="button">Zobacz szczegóły</button>
                     <button class="cart-btn${inCart ? " in-cart" : ""}" type="button">
                       ${inCart ? TXT.inCart(qty) : TXT.addToCart}
                     </button>
@@ -465,7 +509,7 @@
 
             function render(list) {
                 grid.innerHTML = list.map(cardHtml).join("");
-                count.textContent = "Znaleziono produktów: " + list.length;
+                count.textContent = `Znaleziono produktów: ${list.length} z ${products.length}`;
                 empty.hidden = list.length > 0;
             }
 
@@ -491,28 +535,50 @@
                     return matchesText && matchesPrice && matchesCategory;
                 });
 
+                if (sortSelect.value === "price-asc") {
+                    result.sort((a, b) => a.price - b.price);
+                } else if (sortSelect.value === "price-desc") {
+                    result.sort((a, b) => b.price - a.price);
+                } else if (sortSelect.value === "name") {
+                    result.sort((a, b) => a.name.localeCompare(b.name, "pl"));
+                }
                 render(result);
             }
 
             search.addEventListener("input", applyFilters);
+            sortSelect.addEventListener("change", applyFilters);
 
-            // Klik w kategorię: wybiera ją; ponowny klik w tę samą - czyści filtr
-            categoryList.addEventListener("click", function (e) {
+            clearFilters.addEventListener("click", function () {
+                search.value = "";
+                sliderMin.value = 0;
+                sliderMax.value = PRICE_MAX;
+                activeCategory = null;
+                giftLinks.querySelectorAll("button").forEach((button) => {
+                    button.classList.remove("active");
+                    button.setAttribute("aria-pressed", "false");
+                });
+                sortSelect.value = "default";
+                updateSlider();
+                showToast("Wyczyszczono wszystkie filtry");
+            });
+
+            // Skróty kategorii: ponowne kliknięcie aktywnej kategorii usuwa filtr.
+            giftLinks.addEventListener("click", function (e) {
                 const btn = e.target.closest("button[data-category]");
                 if (!btn) return;
-                const li = btn.closest("li");
                 const cat = btn.dataset.category;
 
-                if (activeCategory === cat) {
-                    activeCategory = null;
-                    li.classList.remove("active");
-                } else {
-                    activeCategory = cat;
-                    categoryList
-                        .querySelectorAll("li")
-                        .forEach((x) => x.classList.toggle("active", x === li));
-                }
+                activeCategory = activeCategory === cat ? null : cat;
+                giftLinks.querySelectorAll("button[data-category]").forEach((button) => {
+                    const isActive = button.dataset.category === activeCategory;
+                    button.classList.toggle("active", isActive);
+                    button.setAttribute("aria-pressed", String(isActive));
+                });
                 applyFilters();
+                document.querySelector(".catalog-toolbar").scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
             });
 
             // ===== 8. SUWAK CENOWY =====
@@ -559,19 +625,34 @@
                 }
                 if (e.target.closest(".cart-btn")) {
                     toggleCartItem(id);
+                    return;
+                }
+                if (e.target.closest(".details-btn, .name, .thumb img")) {
+                    openProductModal(id);
+                }
+            });
+
+            grid.addEventListener("keydown", function (e) {
+                if ((e.key === "Enter" || e.key === " ") && e.target.closest(".name")) {
+                    e.preventDefault();
+                    openProductModal(Number(e.target.closest(".card").dataset.id));
                 }
             });
 
             function toggleFavorite(id) {
                 if (favorites.has(id)) favorites.delete(id);
                 else favorites.add(id);
+                persistState();
                 syncUI();
+                showToast(favorites.has(id) ? "Dodano do ulubionych" : "Usunięto z ulubionych");
             }
 
             function toggleCartItem(id) {
                 if (cart.has(id)) cart.delete(id);
                 else cart.set(id, 1);
+                persistState();
                 syncUI();
+                showToast(cart.has(id) ? "Dodano produkt do koszyka" : "Usunięto produkt z koszyka");
             }
 
             // ===== 10. PANEL "ULUBIONE" =====
@@ -592,7 +673,7 @@
                 </div>`,
                           )
                           .join("")
-                    : `<p class="side-panel-empty">Brak ulubionych produktów.</p>`;
+                    : `<div class="side-panel-empty"><span class="empty-icon" aria-hidden="true">♡</span><strong>Lista ulubionych jest pusta</strong><span>Zapisz produkty, które chcesz obejrzeć później.</span></div>`;
 
                 favBadge.textContent = items.length;
                 favBadge.hidden = items.length === 0;
@@ -603,7 +684,9 @@
                 if (!item) return;
                 if (e.target.closest(".fav-item-remove")) {
                     favorites.delete(Number(item.dataset.id));
+                    persistState();
                     syncUI();
+                    showToast("Usunięto z ulubionych");
                 }
             });
 
@@ -634,7 +717,7 @@
                 </div>`;
                           })
                           .join("")
-                    : `<p class="side-panel-empty">Koszyk jest pusty.</p>`;
+                    : `<div class="side-panel-empty"><span class="empty-icon" aria-hidden="true">🛒</span><strong>Twój koszyk jest pusty</strong><span>Dodaj produkt, aby zobaczyć go tutaj.</span></div>`;
 
                 const totalQty = entries.reduce((sum, [, qty]) => sum + qty, 0);
                 const totalPrice = entries.reduce((sum, [id, qty]) => {
@@ -655,7 +738,9 @@
 
                 if (e.target.closest(".cart-item-remove")) {
                     cart.delete(id);
+                    persistState();
                     syncUI();
+                    showToast("Usunięto produkt z koszyka");
                     return;
                 }
 
@@ -665,52 +750,15 @@
                     qty += qtyBtn.dataset.action === "inc" ? 1 : -1;
                     if (qty <= 0) cart.delete(id);
                     else cart.set(id, qty);
+                    persistState();
                     syncUI();
                 }
             });
 
             // ===== 12. ZŁOŻENIE ZAMÓWIENIA =====
-            // Otwiera domyślny program pocztowy z gotowym mailem (temat + treść).
-            // Wysłanie samego maila bez udziału klienta pocztowego wymagałoby
-            // serwera lub usługi typu EmailJS - to najprostszy sposób bez backendu.
             orderBtn.addEventListener("click", function () {
                 if (cart.size === 0) return;
-
-                const lines = [...cart.entries()].map(([id, qty]) => {
-                    const p = findProduct(id);
-                    return p
-                        ? `${p.name} x ${qty} szt. = ${formatPrice.format(p.price * qty)}`
-                        : "";
-                });
-
-                const totalQty = [...cart.values()].reduce(
-                    (sum, qty) => sum + qty,
-                    0,
-                );
-                const totalPrice = [...cart.entries()].reduce(
-                    (sum, [id, qty]) => {
-                        const p = findProduct(id);
-                        return sum + (p ? p.price * qty : 0);
-                    },
-                    0,
-                );
-
-                const subject = `Nowe zamówienie – Pluszak.pl (${totalQty} szt.)`;
-                const body = [
-                    "Szczegóły zamówienia:",
-                    "",
-                    ...lines,
-                    "",
-                    `Liczba sztuk: ${totalQty}`,
-                    `Suma zamówienia: ${formatPrice.format(totalPrice)}`,
-                ].join("\n");
-
-                window.location.href =
-                    "mailto:malyshenko.praca.pl@gmail.com" +
-                    "?subject=" +
-                    encodeURIComponent(subject) +
-                    "&body=" +
-                    encodeURIComponent(body);
+                showToast("To demonstracja — zamówienie nie jest wysyłane");
             });
 
             // ===== 13. OTWIERANIE / ZAMYKANIE PANELI BOCZNYCH =====
@@ -722,6 +770,8 @@
                     p.classList.toggle("open", isThis);
                     p.setAttribute("aria-hidden", isThis ? "false" : "true");
                 });
+                favToggle.setAttribute("aria-expanded", panel === favPanel ? "true" : "false");
+                cartToggle.setAttribute("aria-expanded", panel === cartPanel ? "true" : "false");
                 overlay.classList.add("show");
             }
 
@@ -730,6 +780,8 @@
                     p.classList.remove("open");
                     p.setAttribute("aria-hidden", "true");
                 });
+                favToggle.setAttribute("aria-expanded", "false");
+                cartToggle.setAttribute("aria-expanded", "false");
                 overlay.classList.remove("show");
             }
 
@@ -750,6 +802,51 @@
             overlay.addEventListener("click", closePanels);
             document.addEventListener("keydown", function (e) {
                 if (e.key === "Escape") closePanels();
+            });
+
+            function openProductModal(id) {
+                const p = findProduct(id);
+                if (!p) return;
+                const size = p.name.match(/\b\d+\s*cm\b/i);
+                modalContent.innerHTML = `
+                    <div class="modal-product">
+                        <div class="modal-product-image">${thumbHtml(p)}</div>
+                        <div>
+                            <p class="modal-category">${escapeHtml(p.category)}</p>
+                            <h2 id="modal-title">${escapeHtml(p.name)}</h2>
+                            <p class="modal-price">${formatPrice.format(p.price)}</p>
+                            <p class="modal-description">Przykładowy pluszak z kategorii ${escapeHtml(p.category)}. Szczegóły prezentujemy wyłącznie na potrzeby demonstracji katalogu.</p>
+                            <dl class="product-specs">
+                                <div><dt>Rozmiar</dt><dd>${size ? escapeHtml(size[0]) : "Nie podano"}</dd></div>
+                                <div><dt>Materiał</dt><dd>Nie podano w danych katalogu</dd></div>
+                                <div><dt>Wiek i pielęgnacja</dt><dd>Sprawdź oznaczenia producenta — brak danych demonstracyjnych</dd></div>
+                            </dl>
+                            <p class="demo-note">Zdjęcie i opis mają charakter przykładowy. Produkt nie jest dostępny do zakupu na tej stronie.</p>
+                            <button class="cart-btn" type="button" data-modal-cart="${p.id}">
+                                ${cart.has(p.id) ? TXT.inCart(cart.get(p.id)) : TXT.addToCart}
+                            </button>
+                        </div>
+                    </div>`;
+                productModal.hidden = false;
+                productModal.querySelector(".modal-close").focus();
+            }
+
+            productModal.addEventListener("click", function (e) {
+                if (e.target.closest("[data-close-modal]")) {
+                    productModal.hidden = true;
+                    return;
+                }
+                const button = e.target.closest("[data-modal-cart]");
+                if (button) {
+                    toggleCartItem(Number(button.dataset.modalCart));
+                    productModal.hidden = true;
+                }
+            });
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && !productModal.hidden) {
+                    productModal.hidden = true;
+                }
             });
 
             // ===== 14. WSPÓLNA AKTUALIZACJA CAŁEGO INTERFEJSU =====
